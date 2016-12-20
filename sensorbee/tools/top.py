@@ -59,7 +59,8 @@ class TopView(object):
             lines[0][3:5] = (s['num_received_total'], s['num_errors'])
         if 'output_stats' in status:  # Stream or Source
             s = status['output_stats']
-            for (k, v) in s['outputs'].items():
+            for k in sorted(s['outputs'].keys()):
+                v = s['outputs'][k]
                 queue = v['num_queued']
                 ratio = queue / v['queue_size'] * 100
                 line = [''] * 9
@@ -86,10 +87,15 @@ class TopView(object):
         # They are not "dangling".
         connected = []
         targets = list(sources)
-        for t in [t for t in targets if t not in sinks]:  # Source or Stream
-            outs = sorted([out for out in stats[t]['status']['output_stats']['outputs'].keys() if out not in connected])
-            connected += outs
-            targets += outs
+        while True:
+            targets2 = []
+            for t in targets:
+                if t in sinks: continue
+                outs = sorted([out for out in stats[t]['status']['output_stats']['outputs'].keys() if out not in connected])
+                connected += outs
+                targets2 += outs
+            if len(targets2) == 0: break
+            targets = targets2
 
         return \
             sources + \
