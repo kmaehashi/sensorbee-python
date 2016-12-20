@@ -1,0 +1,47 @@
+language: python
+
+python:
+    - 2.6
+    - 2.7
+    - 3.3
+    - 3.4
+    - 3.5
+
+before_install:
+    - env
+    - uname -a
+
+install:
+    # Install Golang
+    - pushd /tmp
+    - wget "https://storage.googleapis.com/golang/go1.7.4.linux-amd64.tar.gz"
+    - tar xf "go1.7.4.linux-amd64.tar.gz"
+    - popd
+
+    # Set Golang Environment
+    - mkdir -p "${HOME}/gopath"
+    - export GOROOT="/tmp/go"
+    - export GOPATH="${HOME}/gopath"
+    - export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
+
+    # Install SensorBee
+    - pushd /tmp
+    - go get gopkg.in/sensorbee/sensorbee.v0/...
+    - touch build.yaml
+    - build_sensorbee
+    - cp sensorbee ${GOPATH}/bin
+    - popd
+
+script:
+    # Install
+    - pip install -e.[websocket]
+
+    # Run SensorBee
+    - sensorbee run &
+    - sleep 1
+    - sensorbee t c test_topology
+
+    # Run Tests
+    - python example/general_example.py
+    - python example/websocket_example.py
+    - sbstat
