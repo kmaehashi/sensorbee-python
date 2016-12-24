@@ -33,6 +33,7 @@ setup(name='sensorbee-python',
       entry_points={
           'console_scripts': [
               'sbstat=sensorbee.cli:sbstat',
+              'sbpeek=sensorbee.cli:sbpeek',
           ],
       },
       extras_require={
