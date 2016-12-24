@@ -40,8 +40,10 @@ script:
     - sensorbee run &
     - sleep 1
     - sensorbee t c test_topology
+    - echo "CREATE SOURCE ns TYPE node_statuses;" | bql -t test_topology
 
     # Run Tests
     - python example/general_example.py
     - python example/websocket_example.py
     - sbstat
+    - sbpeek ns
