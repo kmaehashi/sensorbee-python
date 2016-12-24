@@ -200,10 +200,14 @@ class ResultSet(object):
         if f:
             f.close()
 
+    def _rbufsize(self, f, size):
+        f.fp._rbufsize = size
+
     def __iter__(self):
         with contextlib.closing(self._f) as f:
             parser = email.parser.FeedParser()
             while True:
+                self._rbufsize(f, 1)
                 line = f.readline()
                 if not line: break
                 if line.rstrip() == '--{0}'.format(self._boundary).encode():
@@ -211,5 +215,7 @@ class ResultSet(object):
                     while line.rstrip():
                         parser.feed(line.decode())
                         line = f.readline()
-                    yield json.loads(f.read(int(parser.close()['Content-Length'])).decode())
+                    length = int(parser.close()['Content-Length'])
+                    self._rbufsize(f, length)
+                    yield json.loads(f.read(length).decode())
                     parser = email.parser.FeedParser()
