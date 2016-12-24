@@ -11,6 +11,7 @@ from .tools.spider import Spider
 from .tools.dot import DotView
 from .tools.top import TopView
 from .tools.peeker import Peeker
+from ._version import __version__
 
 class _OptionParser(optparse.OptionParser, object):
     def __init__(self, *args, **kwargs):
@@ -98,13 +99,15 @@ class SbStatCommand(object):
         return 0
 
     def _create_parser(self):
-        parser = _OptionParser(add_help_option=False)
+        version = '%prog {0}'.format(__version__)
+        usage = 'Usage: %prog [options]'
+        parser = _OptionParser(version=version, usage=usage, add_help_option=False)
         parser.add_option('-H', '--host', type='string', default='127.0.0.1',
                           help='host name or IP address of the server (default: %default)')
         parser.add_option('-P', '--port', type='int', default=15601,
                           help='port number of the server (default: %default)')
         parser.add_option('-t', '--topology', type='string', default=None,
-                          help='topology name (first one is used if not given)')
+                          help='topology name')
         parser.add_option('--json', default=False, action='store_true',
                           help='dump results as JSON')
         parser.add_option('--dot', default=False, action='store_true',
@@ -186,13 +189,15 @@ class SbPeekCommand(object):
         return 0
 
     def _create_parser(self):
-        parser = _OptionParser(add_help_option=False)
+        version = '%prog {0}'.format(__version__)
+        usage = 'Usage: %prog [options] stream'
+        parser = _OptionParser(version=version, usage=usage, add_help_option=False)
         parser.add_option('-H', '--host', type='string', default='127.0.0.1',
                           help='host name or IP address of the server (default: %default)')
         parser.add_option('-P', '--port', type='int', default=15601,
                           help='port number of the server (default: %default)')
         parser.add_option('-t', '--topology', type='string', default=None,
-                          help='topology name (first one is used if not given)')
+                          help='topology name')
         parser.add_option('-c', '--count', type='int', default=1,
                           help='number of records to peek, 0 for infinite (default: %default)')
         parser.add_option('--help', default=False, action='store_true',
