@@ -9,7 +9,7 @@ WebSocket Example
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import sensorbee.api
+from pysensorbee import SensorBeeAPI
 import time
 
 #import websocket
@@ -17,7 +17,7 @@ import time
 
 class WebSocketExample(object):
     def main(self, topology='ws_test'):
-        api = sensorbee.api.SensorBeeAPI()
+        api = SensorBeeAPI()
         api.create_topology(topology)
 
         try:

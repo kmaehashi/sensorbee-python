@@ -8,7 +8,7 @@ def _read(filename):
     return f.read()
 
 # Load package version.
-exec(_read('sensorbee/_version.py'))
+exec(_read('pysensorbee/_version.py'))
 
 setup(name='sensorbee-python',
       version=__version__,
@@ -28,12 +28,12 @@ setup(name='sensorbee-python',
           'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5',
       ],
-      packages=find_packages(exclude=['sensorbee.test']),
-      test_suite = 'sensorbee.test',
+      packages=find_packages(exclude=['pysensorbee.test']),
+      test_suite = 'pysensorbee.test',
       entry_points={
           'console_scripts': [
-              'sbstat=sensorbee.cli:sbstat',
-              'sbpeek=sensorbee.cli:sbpeek',
+              'sbstat=pysensorbee.cli:sbstat',
+              'sbpeek=pysensorbee.cli:sbpeek',
           ],
       },
       extras_require={
