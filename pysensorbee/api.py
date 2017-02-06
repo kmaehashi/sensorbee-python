@@ -24,6 +24,9 @@ except ImportError:
 
 class SensorBeeAPI(object):
     def __init__(self, host='127.0.0.1', port=15601):
+        """
+        SensorBee API client.
+        """
         self.host = host
         self.port = port
 
@@ -38,39 +41,79 @@ class SensorBeeAPI(object):
         return json.loads(urlopen(req).read().decode())
 
     def runtime_status(self):
+        """
+        Returns the runtime status of the SensorBee process.
+        """
         return self._req('runtime_status')
 
     def topologies(self):
+        """
+        Returns the list of topologies.
+        """
         return self._req('topologies')
 
     def topology(self, t):
+        """
+        Returns the status of the specified topology.
+        """
         return self._req('topologies/{0}'.format(t))
 
     def create_topology(self, t):
+        """
+        Creates a new topology using the specified name.
+        """
         return self._req('topologies', json.dumps({'name': t}).encode())
 
     def delete_topology(self, t):
+        """
+        Deletes the specified topology.
+        """
         return self._req('topologies/{0}'.format(t), None, 'DELETE')
 
     def sources(self, t):
+        """
+        Returns the list of sources in the topology.
+        """
         return self._req('topologies/{0}/sources'.format(t))
 
     def source(self, t, s):
+        """
+        Returns the status of the specified source.
+        """
         return self._req('topologies/{0}/sources/{1}'.format(t, s))
 
     def streams(self, t):
+        """
+        Returns the list of streams in the topology.
+        """
         return self._req('topologies/{0}/streams'.format(t))
 
     def stream(self, t, s):
+        """
+        Returns the status of the specified stream.
+        """
         return self._req('topologies/{0}/streams/{1}'.format(t, s))
 
     def sinks(self, t):
+        """
+        Returns the list of sinks in the topology.
+        """
         return self._req('topologies/{0}/sinks'.format(t))
 
     def sink(self, t, s):
+        """
+        Returns the status of the specified sink.
+        """
         return self._req('topologies/{0}/sinks/{1}'.format(t, s))
 
     def query(self, t, q):
+        """
+        Runs synchronous query on the topology.
+        For ``SELECT`` queries, a ``ResultSet`` instance is returned; you can
+        iterate over it to retrieve tuples.
+        For other kind of queries, a dict instance that contains the result of
+        the query is returned.
+        """
         close = True
         f = urlopen(self._url('topologies/{0}/queries'.format(t)), json.dumps({'queries': q}).encode())
         try:
@@ -89,12 +132,24 @@ class SensorBeeAPI(object):
                 f.close()
 
     def wsquery(self, t):
+        """
+        Returns a WebSocket API client (``WebSocketClient``) for the topology.
+        """
         if not _WEBSOCKET_AVAILABLE:
             raise RuntimeError('websocket module is unavailable')
         return WebSocketClient(self._url('topologies/{0}/wsqueries'.format(t), 'ws'))
 
 class WebSocketClient(object):
     def __init__(self, uri):
+        """
+        SensorBee WebSocket API client.
+        By using WebSocket API, you can run asynchronous query on the topology.
+
+        Before sending queries through WebSocket API, you need to run the client
+        application thread.  It can be started by ``start`` method.  If you want
+        to manage the thread or other low-level things by yourself, you can use
+        ``run`` and ``setup`` methods instead.
+        """
         self._uri = uri
         self._app = None
         self._open = False
@@ -134,9 +189,15 @@ class WebSocketClient(object):
         self._app.send(data)
 
     def close(self, **kwargs):
+        """
+        Shuts the connection down.
+        """
         self._app.close(**kwargs)
 
     def get_error(self):
+        """
+        Returns the last error occurred.
+        """
         return self._error
 
     def setup(self, **kwargs):
@@ -178,6 +239,9 @@ class WebSocketClient(object):
 
 class _MessageWrapper(object):
     def __init__(self, msg):
+        """
+        This class is needed just for Python 2/3 compatibility.
+        """
         self.msg = msg
 
     def get_content_type(self, *args, **kwargs):
