@@ -34,7 +34,7 @@ class TopView(object):
             for (i, v) in enumerate(line):
                 colsize[i] = max(colsize[i], len(str(v)))
         fmt = ''.join([
-            '{0:<3}',
+            '{0:<' + str(colsize[0] + 1) + '}',
             '{1:<' + str(colsize[1] + 3) + '}',
             '{2:<' + str(colsize[2] + 3) + '}',
             '{3:>' + str(colsize[3] + 0) + '}',
