@@ -26,7 +26,7 @@ class TopView(object):
         columns  = ['', 'Node', 'Status', 'Received', 'Error', 'Output', 'Sent', 'Queued', 'Dropped']
         lines = [columns]
         for s in [allstats[n] for n in names]:
-            lines += self._generate_status_lines(self.FLAGS[s['node_type']], s['name'], s['state'], s['status'])
+            lines += self._generate_status_lines(s['node_type'], s['name'], s['state'], s['status'])
 
         # Adjust the column size nicely.
         colsize = [0] * len(columns)
@@ -34,7 +34,7 @@ class TopView(object):
             for (i, v) in enumerate(line):
                 colsize[i] = max(colsize[i], len(str(v)))
         fmt = ''.join([
-            '{0:<3}',
+            '{0:<' + str(colsize[0] + 1) + '}',
             '{1:<' + str(colsize[1] + 3) + '}',
             '{2:<' + str(colsize[2] + 3) + '}',
             '{3:>' + str(colsize[3] + 0) + '}',
@@ -45,20 +45,19 @@ class TopView(object):
             '{8:>' + str(colsize[8] + 3) + '}',
         ])
 
-        # Render the table.
-        rendered = [fmt.format(*map(str, line)) for line in lines]
+        # Returns the rendered the table.
+        return '\n'.join([fmt.format(*map(str, line)) for line in lines])
 
-        return '\n'.join(rendered)
-
-    def _generate_status_lines(self, flag, name, state, status):
+    def _generate_status_lines(self, nodetype, name, state, status):
         # Flag, Node, Status, Received, Error, Output, Sent, Queued, Dropped
         lines = [[''] * 9]
-        lines[0][0:3] = (flag, name, state)
+        lines[0][0:3] = (self.FLAGS[nodetype], name, state)
         if 'input_stats' in status:  # Stream or Sink
             s = status['input_stats']
             lines[0][3:5] = (s['num_received_total'], s['num_errors'])
         if 'output_stats' in status:  # Stream or Source
             s = status['output_stats']
+            lines[0][5:9] = ('(total)', s['num_sent_total'], '', s['num_dropped'])
             for k in sorted(s['outputs'].keys()):
                 v = s['outputs'][k]
                 queue = v['num_queued']
@@ -66,7 +65,6 @@ class TopView(object):
                 line = [''] * 9
                 line[5:8] = ('    {0}'.format(k), v['num_sent'], '{0} ({1:3.1f}%)'.format(queue, ratio))
                 lines.append(line)
-            lines[0][5:9] = ('(total)', s['num_sent_total'], '', s['num_dropped'])
         return lines
 
     def _ordered_names(self, stats):

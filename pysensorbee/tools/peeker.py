@@ -8,10 +8,9 @@ class Peeker(object):
         self._api = api
 
     def peek(self, topology, stream, count):
-        query = 'SELECT RSTREAM * FROM {0} [RANGE 1 TUPLES];'.format(stream)
-        received = 0
+        limit = ''
+        if count != 0:
+            limit = '[LIMIT {0}]'.format(count)
+        query = 'SELECT RSTREAM {0} * FROM {1} [RANGE 1 TUPLES];'.format(limit, stream)
         for data in self._api.query(topology, query):
-            received += 1
             yield data
-            if 0 < count and count <= received:
-                break

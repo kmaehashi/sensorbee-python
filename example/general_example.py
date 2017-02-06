@@ -3,11 +3,11 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import sensorbee.api
+from pysensorbee import SensorBeeAPI
 
 class GeneralExample(object):
     def main(self):
-        api = sensorbee.api.SensorBeeAPI()
+        api = SensorBeeAPI()
         print("Runtime Status:")
         print(api.runtime_status())
 

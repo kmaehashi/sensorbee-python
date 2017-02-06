@@ -181,8 +181,9 @@ class SbPeekCommand(object):
                 print_out(err, 'Topologies: {0}\n'.format(', '.join(sorted(topos))))
                 return 1
 
+        indent = None if params.oneline else 4
         for d in Peeker(api).peek(params.topology, stream, params.count):
-            print_out(self._out, json.dumps(d, indent=4))
+            print_out(self._out, json.dumps(d, indent=indent))
             print_out(self._out, '\n')
             self._out.flush()
 
@@ -200,6 +201,8 @@ class SbPeekCommand(object):
                           help='topology name')
         parser.add_option('-c', '--count', type='int', default=1,
                           help='number of records to peek, 0 for infinite (default: %default)')
+        parser.add_option('-1', '--oneline', default=False, action='store_true',
+                          help='do not pretty-print tuples')
         parser.add_option('--help', default=False, action='store_true',
                           help='print the usage and exit')
         return parser
