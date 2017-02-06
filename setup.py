@@ -3,9 +3,10 @@
 
 from setuptools import setup, find_packages
 
+
 def _read(filename):
-  with open(filename) as f:
-    return f.read()
+    with open(filename) as f:
+        return f.read()
 
 # Load package version.
 exec(_read('pysensorbee/_version.py'))
