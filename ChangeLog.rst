@@ -1,6 +1,15 @@
 ChangeLog
 =========
 
+Release 0.2.0 (2017-02-06)
+---------------------------------------
+
+* Improvements
+    * Module name changed from ``sensorbee`` to ``pysensorbee`` to avoid conflict
+    * Add ``--oneline`` option to ``sbpeek``
+    * Improve ``sbpeek`` to uses SELECT RSTREAM LIMIT syntax
+    * Other small refactorings
+
 Release 0.1.2 (2016-12-25)
 ---------------------------------------
 
