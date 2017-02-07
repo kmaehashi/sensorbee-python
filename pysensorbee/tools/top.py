@@ -12,8 +12,22 @@ class TopView(object):
         self._api = api
 
     def render(self, t):
-        # Get all status values.
-        ts = Spider(self._api).get_topology_status(t)
+        spider = Spider(self._api)
+
+        # Get runtime status values.
+        rs = spider.get_runtime_status()
+        header = '''SensorBee: {0} @ {1}:{2} [Host: {3}] [PID: {4}]
+GOMAXPROCS: {5} (NumCPU: {6})
+NumGoroutine: {7}
+NumCgoCall: {8}\n\n'''.format(
+            t, self._api.host, self._api.port, rs['hostname'], rs['pid'],
+            rs['gomaxprocs'], rs['num_cpu'],
+            rs['num_goroutine'],
+            rs['num_cgo_call'],
+        )
+
+        # Get topology status values.
+        ts = spider.get_topology_status(t)
         allstats = {}
         allstats.update(ts['sources'])
         allstats.update(ts['streams'])
@@ -46,7 +60,7 @@ class TopView(object):
         ])
 
         # Returns the rendered the table.
-        return '\n'.join([fmt.format(*map(str, line)) for line in lines])
+        return header + '\n'.join([fmt.format(*map(str, line)) for line in lines])
 
     def _generate_status_lines(self, nodetype, name, state, status):
         # Flag, Node, Status, Received, Error, Output, Sent, Queued, Dropped
