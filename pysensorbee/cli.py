@@ -13,6 +13,10 @@ from .tools.top import TopView
 from .tools.peeker import Peeker
 from ._version import __version__
 
+
+# For Python 3 compatibility
+unicode = type('')
+
 class _OptionParser(optparse.OptionParser, object):
     def __init__(self, *args, **kwargs):
         self._error = False
@@ -183,11 +187,26 @@ class SbPeekCommand(object):
 
         indent = None if params.oneline else 4
         for d in Peeker(api).peek(params.topology, stream, params.count):
+            if params.omit_long_strings:
+                d = self._omit_long_strings(d)
             print_out(self._out, json.dumps(d, indent=indent))
             print_out(self._out, '\n')
             self._out.flush()
 
         return 0
+
+    def _omit_long_strings(self, v):
+        if isinstance(v, unicode) and len(v) > 40:
+            return '{0}... (omit)'.format(v[0:40])
+        elif isinstance(v, list):
+            return [self._omit_long_strings(elem) for elem in v]
+        elif isinstance(v, dict):
+            # keys should not be summarized
+            v2 = {}
+            for key in v.keys():
+                v2[key] = self._omit_long_strings(v[key])
+            return v2
+        return v
 
     def _create_parser(self):
         version = '%prog {0}'.format(__version__)
@@ -203,6 +222,8 @@ class SbPeekCommand(object):
                           help='number of records to peek, 0 for infinite (default: %default)')
         parser.add_option('-1', '--oneline', default=False, action='store_true',
                           help='do not pretty-print tuples')
+        parser.add_option('-m', '--omit-long-strings', default=False, action='store_true',
+                          help='omit long string values; useful for large blobs')
         parser.add_option('--help', default=False, action='store_true',
                           help='print the usage and exit')
         return parser
