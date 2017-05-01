@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+Release 0.2.1 (2017-05-01)
+---------------------------------------
+
+* Improvements
+    * Improve ``sbstat`` to display runtime status
+    * Add ``--omit-long-strings`` option to ``sbpeek``
+
 Release 0.2.0 (2017-02-06)
 ---------------------------------------
 

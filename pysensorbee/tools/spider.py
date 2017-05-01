@@ -12,7 +12,7 @@ class Spider(object):
             'runtime_status': self.get_runtime_status(),
             'topologies': {},
         }
-        for t in map(lambda x: x['name'], self._api.topologies()['topologies']):
+        for t in [x['name'] for x in self._api.topologies()['topologies']]:
             status['topologies'][t] = self.get_topology_status(t)
         return status
 
@@ -25,10 +25,10 @@ class Spider(object):
             'streams': {},
             'sinks': {},
         }
-        for s in map(lambda x: x['name'], self._api.sources(t)['sources']):
+        for s in [x['name'] for x in self._api.sources(t)['sources']]:
             status['sources'][s] = self._api.source(t, s)['source']
-        for s in map(lambda x: x['name'], self._api.streams(t)['streams']):
+        for s in [x['name'] for x in self._api.streams(t)['streams']]:
             status['streams'][s] = self._api.stream(t, s)['stream']
-        for s in map(lambda x: x['name'], self._api.sinks(t)['sinks']):
+        for s in [x['name'] for x in self._api.sinks(t)['sinks']]:
             status['sinks'][s] = self._api.sink(t, s)['sink']
         return status
