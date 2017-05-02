@@ -10,7 +10,7 @@ sensorbee-python
 ================
 
 This is a Python client library for `SensorBee <http://sensorbee.io/>`_ REST / WebSocket API.
-This library also provides utility commands (``sbstat`` and ``sbpeek``) which can be used to monitor SensorBee topology status.
+This library also provides utility commands (``sbstat`` and ``sbpeek``) which can be used to inspect SensorBee topology.
 
 Install
 -------
@@ -28,7 +28,7 @@ To use WebSocket Client API, you also need to install `websocket-client <https:/
 Requirements
 ------------
 
-* Python 2.6, 2.7, 3.3, 3.4 or 3.5.
+* Python 2.6, 2.7, 3.3, 3.4, 3.5 or 3.6.
 
 Usage
 -----
@@ -66,7 +66,9 @@ Commands
                                                                     sensorbee_tmp_select_sink_7   5381   0 (0.0%)
   <- sensorbee_tmp_select_sink_7   running       5381       0
 
-``sbpeek`` can be used to peek what tuple is currently running through the specified source/stream.
+Sources, streams and sinks are indicated by ``->``, ``::`` and ``<-``, respectively.
+
+``sbpeek`` can be used to peek what tuple is currently running through the specified source or stream.
 
 ::
 
@@ -80,7 +82,6 @@ Notice
 
 * This library is not a part of the official SensorBee project.
 * In addition to APIs documented in the `API Specification Version 1 <https://github.com/sensorbee/sensorbee/blob/master/server/v1_api.md>`_, this library supports some undocumented APIs, including WebSocket API.
-* Long queries may not be accepted by SensorBee via WebSocket Client API.
 * This project is a successor of `beepy <https://github.com/kmaehashi/beepy>`_.
 
 License
