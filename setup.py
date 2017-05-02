@@ -13,7 +13,7 @@ exec(_read('pysensorbee/_version.py'))
 
 setup(name='sensorbee-python',
       version=__version__,
-      description='SensorBee REST API Client',
+      description='SensorBee API Client',
       long_description=_read('README.rst'),
       url='https://github.com/kmaehashi/sensorbee-python',
       author='Kenichi Maehashi',
