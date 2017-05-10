@@ -7,6 +7,7 @@ import json
 import email.parser
 import threading
 import time
+import traceback
 
 try:
     # Python 3
@@ -212,8 +213,10 @@ class WebSocketClient(object):
         """
         if not self._open:
             raise RuntimeError('not connected')
+        if rid in self._callback:
+            raise RuntimeError('the request ID {0} is currently used by another request'.format(rid))
         data = json.dumps({'rid': int(rid), 'payload': {'queries': queries}}).encode()
-        self._callback[rid] = callback
+        self._callback[rid] = [callback, None]
         self._app.send(data)
 
     def close(self, **kwargs):
@@ -254,10 +257,27 @@ class WebSocketClient(object):
 
     def _on_message(self, ws, data):
         msg = json.loads(data)
-        (msgRid, msgType, msgPayload) = (msg['rid'], msg['type'], msg['payload'])
-        cb = self._callback[msgRid]
-        # TODO: remove callback function
-        cb(self, msgRid, msgType, msgPayload)
+        (rid, msgtype, payload) = (msg['rid'], msg['type'], msg['payload'])
+        (cb, is_stream) = self._callback[rid]
+
+        # On the initial message, automatically detect whether the query was
+        # a SELECT stream or oneshot request.
+        if is_stream is None:
+            self._callback[rid][1] = is_stream = (msgtype in ['sos', 'ping', 'eos'])
+
+        # We cannot remove a callback function for a SELECT stream until
+        # 'eos' or 'error' message is observed.
+        remove_callback = not is_stream or (msgtype in ['eos', 'error'])
+
+        try:
+            # Invoke callback.
+            cb(self, rid, msgtype, payload)
+        except Exception as e:
+            traceback.print_exc()
+            self._error = e
+        finally:
+            if remove_callback:
+                del self._callback[rid]
 
     def _on_error(self, ws, err):
         self._error = err
