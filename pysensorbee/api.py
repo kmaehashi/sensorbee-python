@@ -38,7 +38,7 @@ class SensorBeeAPI(object):
             method = 'GET' if data is None else 'POST'
         req = Request(self._url(path), data=data)
         req.get_method = lambda: method
-        return json.loads(urlopen(req).read().decode())
+        return json.loads(urlopen(req).read().decode('utf-8'))
 
     def runtime_status(self):
         """
@@ -120,7 +120,7 @@ class SensorBeeAPI(object):
             msg = _MessageWrapper(f.info())
             mimetype = msg.get_content_type()
             if mimetype == 'application/json':
-                return json.loads(f.read().decode())
+                return json.loads(f.read().decode('utf-8'))
             elif mimetype == 'multipart/mixed':
                 rs = ResultSet(f, msg.get_param('boundary'))
                 close = False
@@ -277,9 +277,9 @@ class ResultSet(object):
                 if line.rstrip() == '--{0}'.format(self._boundary).encode():
                     line = f.readline()
                     while line.rstrip():
-                        parser.feed(line.decode())
+                        parser.feed(line.decode('utf-8'))
                         line = f.readline()
                     length = int(parser.close()['Content-Length'])
                     self._rbufsize(f, length)
-                    yield json.loads(f.read(length).decode())
+                    yield json.loads(f.read(length).decode('utf-8'))
                     parser = email.parser.FeedParser()
