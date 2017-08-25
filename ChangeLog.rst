@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+Release 0.2.2 (2017-08-25)
+---------------------------------------
+
+* Improvements
+    * Explicitly use UTF-8 to decode messages returned from SensorBee
+    * Support Python 3.6
+
 Release 0.2.1 (2017-05-01)
 ---------------------------------------
 

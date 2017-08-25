@@ -33,7 +33,7 @@ class GeneralExample(object):
             print(api.sinks('beepy_test'))
 
             print("Send EVAL Query:")
-            print(api.query('beepy_test', 'EVAL 1+2+3;'))
+            print(api.query('beepy_test', 'EVAL concat((1+2+3)::string, " -> ", "六");'))
 
             print("Send SELECT Query:")
             rs = api.query('beepy_test', 'SELECT RSTREAM * FROM ns [RANGE 1 TUPLES];')
