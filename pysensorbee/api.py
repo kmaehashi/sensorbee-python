@@ -11,9 +11,11 @@ import time
 try:
     # Python 3
     from urllib.request import urlopen, Request
+    from urllib.error import HTTPError
 except ImportError:
     # Python 2
     from urllib2 import urlopen, Request
+    from urllib2 import HTTPError
 
 try:
     import websocket
@@ -23,6 +25,12 @@ except ImportError:
 
 
 class SensorBeeAPI(object):
+    ERRORS = {
+        404: 'Topology Not Found',
+        400: 'Request Failure',
+        500: 'Execution Failure',
+    }
+
     def __init__(self, host='127.0.0.1', port=15601):
         """
         SensorBee API client.
@@ -38,7 +46,15 @@ class SensorBeeAPI(object):
             method = 'GET' if data is None else 'POST'
         req = Request(self._url(path), data=data)
         req.get_method = lambda: method
-        return json.loads(urlopen(req).read().decode('utf-8'))
+        return json.loads(self._urlopen(req).read().decode('utf-8'))
+
+    def _urlopen(self, *args, **kwargs):
+        try:
+            return urlopen(*args, **kwargs)
+        except HTTPError as e:
+            if e.code in self.ERRORS:
+                raise SensorBeeAPIError(self.ERRORS[e.code], json.loads(e.read().decode('utf-8'))['error'])
+            raise
 
     def runtime_status(self):
         """
@@ -115,7 +131,7 @@ class SensorBeeAPI(object):
         the query is returned.
         """
         close = True
-        f = urlopen(self._url('topologies/{0}/queries'.format(t)), json.dumps({'queries': q}).encode())
+        f = self._urlopen(self._url('topologies/{0}/queries'.format(t)), json.dumps({'queries': q}).encode())
         try:
             msg = _MessageWrapper(f.info())
             mimetype = msg.get_content_type()
@@ -138,6 +154,18 @@ class SensorBeeAPI(object):
         if not _WEBSOCKET_AVAILABLE:
             raise RuntimeError('websocket module is unavailable')
         return WebSocketClient(self._url('topologies/{0}/wsqueries'.format(t), 'ws'))
+
+class SensorBeeAPIError(Exception):
+    def __init__(self, kind, err):
+        self.error_message = err['message']
+        self.error_code = err['code']
+        self.request_id = err['request_id']
+        self.meta = err['meta']
+
+        msg = '{0}: {1} ({2}) [Request ID: {3}]\n{4}'.format(
+                kind, self.error_message, self.error_code, self.request_id,
+                json.dumps(self.meta, indent=2))
+        super(SensorBeeAPIError, self).__init__(msg)
 
 class WebSocketClient(object):
     def __init__(self, uri):
