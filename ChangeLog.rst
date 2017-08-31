@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+Release 0.3.0 (2017-08-31)
+---------------------------------------
+
+* Improvements
+    * Add ``--expressions`` option to ``sbpeek``
+    * Translate error object returned from SensorBee
+
 Release 0.2.2 (2017-08-25)
 ---------------------------------------
 
