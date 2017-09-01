@@ -186,7 +186,7 @@ class SbPeekCommand(object):
                 return 1
 
         indent = None if params.oneline else 4
-        for d in Peeker(api).peek(params.topology, stream, params.count):
+        for d in Peeker(api).peek(params.topology, stream, params.count, params.expressions):
             if params.omit_long_strings:
                 d = self._omit_long_strings(d)
             print_out(self._out, json.dumps(d, indent=indent))
@@ -220,6 +220,8 @@ class SbPeekCommand(object):
                           help='topology name')
         parser.add_option('-c', '--count', type='int', default=1,
                           help='number of records to peek, 0 for infinite (default: %default)')
+        parser.add_option('-e', '--expressions', type='string', default='*',
+                          help='comma-separated list of expressions to SELECT (default: %default)')
         parser.add_option('-1', '--oneline', default=False, action='store_true',
                           help='do not pretty-print tuples')
         parser.add_option('-m', '--omit-long-strings', default=False, action='store_true',
