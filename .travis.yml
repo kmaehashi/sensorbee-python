@@ -33,6 +33,9 @@ install:
     - cp sensorbee ${GOPATH}/bin
     - popd
 
+    # Install Coveralls
+    - pip install coveralls
+
 script:
     # Install
     - pip install -e.[websocket]
@@ -40,11 +43,20 @@ script:
     # Run SensorBee
     - sensorbee run &
     - sleep 1
+
+    # Run Unit Tests
+    - export SB_TEST_HOST=127.0.0.1
+    - export SB_TEST_PORT=15601
+    - coverage run -p setup.py test
+
+    # Run Integration Tests
     - sensorbee t c test_topology
     - echo "CREATE SOURCE ns TYPE node_statuses;" | bql -t test_topology
-
-    # Run Tests
     - python example/general_example.py
     - python example/websocket_example.py
     - sbstat
     - sbpeek ns
+
+after_success:
+    - coverage combine
+    - coveralls

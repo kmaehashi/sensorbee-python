@@ -1,7 +1,10 @@
-|Travis|_ |PyPi|_
+|Travis|_ |Coveralls|_ |PyPi|_
 
 .. |Travis| image:: https://api.travis-ci.org/kmaehashi/sensorbee-python.svg?branch=master
 .. _Travis: https://travis-ci.org/kmaehashi/sensorbee-python
+
+.. |Coveralls| image:: https://coveralls.io/repos/kmaehashi/sensorbee-python/badge.svg?branch=master&service=github
+.. _Coveralls: https://coveralls.io/r/kmaehashi/sensorbee-python
 
 .. |PyPi| image:: https://badge.fury.io/py/sensorbee-python.svg
 .. _PyPi: https://badge.fury.io/py/sensorbee-python
