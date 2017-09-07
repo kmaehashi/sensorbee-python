@@ -22,6 +22,10 @@ class SensorBeeAPITest(TestCase):
         self.api.delete_topology(self.TOPOLOGY)
         self.api.delete_topology(self.TOPOLOGY2)
 
+    def test_error(self):
+        self.assertRaises(SensorBeeAPIError, self.api.sources, 'no_such_topology')
+        self.assertRaises(SensorBeeAPIError, self.api.query, self.TOPOLOGY, 'INVALID BQL')
+
     def test_init(self):
         self.assertEqual(SB_TEST_HOST, self.api.host)
         self.assertEqual(SB_TEST_PORT, self.api.port)
@@ -104,24 +108,70 @@ class SensorBeeAPITest(TestCase):
             api.query(self.TOPOLOGY,
                 'DROP SOURCE ns;')
 
-    def test_error(self):
-        self.assertRaises(SensorBeeAPIError, self.api.sources, 'no_such_topology')
-        self.assertRaises(SensorBeeAPIError, self.api.query, self.TOPOLOGY, 'INVALID BQL')
-
     def test_wsquery(self):
         api = self.api
+        api.query(self.TOPOLOGY, 'CREATE SOURCE ns TYPE node_statuses WITH interval = 0.1;')
         wsc = api.wsquery(self.TOPOLOGY)
         wsc.start()
         try:
-            wsc._test_done = False
-            def callback(wsc2, rid, type, payload):
+            # One-shot
+            wsc._test_oneshot = False
+            def callback_1(wsc2, rid, type, payload):
                 self.assertEqual(wsc, wsc2)
                 self.assertEqual(1, rid)
                 self.assertEqual('result', type)
                 self.assertEqual({'result': 42}, payload)
-                wsc2._test_done = True
-            wsc.send('EVAL 7 * 6;', callback, 1)
-            while not wsc._test_done:
+                wsc._test_oneshot = True
+            wsc.send('EVAL 7 * 6;', callback_1, 1)
+
+            # Stream
+            wsc._test_stream = False
+            wsc._test_stream_types = []
+            def callback_2(wsc2, rid, type, payload):
+                self.assertEqual(2, rid)
+                if type == 'eos':
+                    self.assertEqual(['sos', 'result', 'result'], wsc._test_stream_types)
+                    wsc._test_stream = True
+                wsc._test_stream_types.append(type)
+            wsc.send('SELECT RSTREAM [LIMIT 2] * FROM ns [RANGE 1 TUPLES];', callback_2, 2)
+
+            # Error
+            wsc._test_error = False
+            def callback_3(wsc2, rid, type, payload):
+                self.assertEqual(3, rid)
+                self.assertEqual('error', type)
+                wsc._test_error = True
+            wsc.send('INVALID BQL', callback_3, 3)
+
+            # Wait for above tests to complete.
+            while not (wsc._test_oneshot and wsc._test_stream and wsc._test_error):
                 time.sleep(0.1)
+
+            # Request ID in use
+            wsc._test_stream2 = False
+            def callback_4(wsc2, rid, type, payload):
+                if type == 'eos':
+                    wsc._test_stream2 = True
+            wsc.send('SELECT RSTREAM [LIMIT 100] * FROM ns [RANGE 1 TUPLES];', callback_4, 4)
+            self.assertRaises(RuntimeError, wsc.send, 'EVAL 0;', callback_4, 4)
+
+            # Wait for above tests to complete.
+            while not (wsc._test_stream2):
+                time.sleep(0.1)
+
+            # Now the request ID can be reused.
+            wsc.send('EVAL 0;', callback_4, 4)
+
+            # Exception in callback
+            def callback_5(wsc2, rid, type, payload):
+                print("--- this test prints a stack trace; ignore it. ---")
+                raise RuntimeError('expected exception')
+            wsc.send('EVAL 0;', callback_5, 5)
+
+            # Wait for the above tests to complete.
+            while not wsc.get_error():
+                time.sleep(0.1)
+
+            self.assertEqual('expected exception', wsc.get_error().message)
         finally:
             wsc.close()
