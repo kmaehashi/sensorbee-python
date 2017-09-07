@@ -42,6 +42,7 @@ class SensorBeeAPITest(TestCase):
         self.assertEqual(self.TOPOLOGY2,
             api.create_topology(self.TOPOLOGY2)['topology']['name'])
         try:
+            self.assertEqual(self.TOPOLOGY2, api.topology(self.TOPOLOGY2)['topology']['name'])
             self.assertEqual(2, len(api.topologies()['topologies']))
         finally:
             self.assertEqual({}, api.delete_topology(self.TOPOLOGY2))
