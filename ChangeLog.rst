@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+Release 0.3.1 (2017-09-07)
+---------------------------------------
+
+* Improvements
+    * Raise error when duplicate request ID is used in WebSocket API
+    * Add unit tests
+
 Release 0.3.0 (2017-09-01)
 ---------------------------------------
 
