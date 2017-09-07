@@ -46,6 +46,8 @@ script:
     - sensorbee t c test_topology
 
     # Run Unit Tests
+    - export SB_TEST_HOST=127.0.0.1
+    - export SB_TEST_PORT=15601
     - coverage run -p setup.py test
 
     # Run Integration Tests
