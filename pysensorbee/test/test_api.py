@@ -173,6 +173,6 @@ class SensorBeeAPITest(TestCase):
             while not wsc.get_error():
                 time.sleep(0.1)
 
-            self.assertEqual('expected exception', wsc.get_error().message)
+            self.assertEqual('expected exception', wsc.get_error().args[0])
         finally:
             wsc.close()
