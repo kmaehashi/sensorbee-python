@@ -43,7 +43,6 @@ script:
     # Run SensorBee
     - sensorbee run &
     - sleep 1
-    - sensorbee t c test_topology
 
     # Run Unit Tests
     - export SB_TEST_HOST=127.0.0.1
@@ -51,9 +50,10 @@ script:
     - coverage run -p setup.py test
 
     # Run Integration Tests
+    - sensorbee t c test_topology
+    - echo "CREATE SOURCE ns TYPE node_statuses;" | bql -t test_topology
     - python example/general_example.py
     - python example/websocket_example.py
-    - echo "CREATE SOURCE ns TYPE node_statuses;" | bql -t test_topology
     - sbstat
     - sbpeek ns
 
