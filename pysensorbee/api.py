@@ -225,6 +225,12 @@ class WebSocketClient(object):
         """
         self._app.close(**kwargs)
 
+    def is_open(self):
+        """
+        Returns if the connection is established.
+        """
+        return self._open
+
     def get_error(self):
         """
         Returns the last error occurred.
