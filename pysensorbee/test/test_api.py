@@ -115,6 +115,9 @@ class SensorBeeAPITest(TestCase):
         wsc = api.wsquery(self.TOPOLOGY)
         wsc.start()
         try:
+            # Ensure that the connection is open.
+            self.assertTrue(wsc.is_open())
+
             # One-shot
             wsc._test_oneshot = False
             def callback_1(wsc2, rid, type, payload):
