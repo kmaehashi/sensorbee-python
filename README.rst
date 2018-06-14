@@ -22,7 +22,7 @@ Install
 
   pip install sensorbee-python
 
-To use WebSocket Client API, you also need to install `websocket-client <https://github.com/liris/websocket-client>`_:
+To use WebSocket Client API, you also need to install `websocket-client <https://github.com/websocket-client/websocket-client>`_:
 
 ::
 
