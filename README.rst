@@ -31,7 +31,7 @@ To use WebSocket Client API, you also need to install `websocket-client <https:/
 Requirements
 ------------
 
-* Python 2.6, 2.7, 3.3, 3.4, 3.5 or 3.6.
+* Python 2.7, 3.3, 3.4, 3.5 or 3.6.
 
 Usage
 -----
