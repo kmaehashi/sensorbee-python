@@ -1,7 +1,6 @@
 language: python
 
 python:
-    - 2.6
     - 2.7
     - 3.3
     - 3.4
@@ -33,8 +32,9 @@ install:
     - cp sensorbee ${GOPATH}/bin
     - popd
 
-    # Install Coveralls
+    # Install Coverage Clients
     - pip install coveralls
+    - pip install codecov
 
 script:
     # Install
@@ -60,3 +60,4 @@ script:
 after_success:
     - coverage combine
     - coveralls
+    - codecov

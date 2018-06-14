@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+Release 0.3.2 (2018-06-14)
+---------------------------------------
+
+* Improvements
+    * Drop support for Python 2.6
+    * Add ``is_open`` API to WebSocketClient
+
 Release 0.3.1 (2017-09-07)
 ---------------------------------------
 
