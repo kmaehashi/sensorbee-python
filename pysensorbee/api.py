@@ -191,15 +191,15 @@ class WebSocketClient(object):
         if app is not None:
             app.close()
 
-    def start(self, async=False):
+    def start(self, async_=False):
         """
-        Starts the client application thread.  When ``async`` is set to False,
+        Starts the client application thread.  When ``async_`` is set to False,
         this method waits for the connection to be established.
         """
         t = threading.Thread(target=self.run)
         t.daemon = True
         t.start()
-        if not async:
+        if not async_:
             while not self._open:
                 if self._error is not None:
                     raise self._error
